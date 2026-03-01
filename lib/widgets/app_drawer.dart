@@ -22,14 +22,39 @@ class AppDrawer extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 56, 20, 24),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppTheme.primaryDark, AppTheme.primary],
+                colors: [
+                  Color(0xFF0D3D28),
+                  Color(0xFF1A7A52),
+                  Color(0xFF28A96E),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
               children: [
+                // Decorative blob
+                Positioned(
+                  right: -10,
+                  top: -10,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.07),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 10,
+                  bottom: -20,
+                  child: const Text('🍽️',
+                      style: TextStyle(fontSize: 30, color: Colors.white)),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: Colors.white24,
@@ -70,7 +95,9 @@ class AppDrawer extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          ],
+        ),
+      ),
 
           // ─── Nav Items ────────────────────────────────────────────────────────
           Expanded(

@@ -59,6 +59,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0D3D28), Color(0xFF1A7A52), Color(0xFF28A96E)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_outlined),
@@ -79,15 +88,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       drawer: const AppDrawer(),
-      body: LoadingOverlay(
-        isLoading: _isLoading,
-        child: RefreshIndicator(
-          onRefresh: _loadAll,
-          color: AppTheme.primary,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(16),
-            child: Column(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF8F3EE), Color(0xFFEFF6EF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: LoadingOverlay(
+          isLoading: _isLoading,
+          child: RefreshIndicator(
+            onRefresh: _loadAll,
+            color: AppTheme.primary,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // ─── Greeting ─────────────────────────────────────────────────
@@ -181,7 +198,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildGreeting(AuthProvider auth) {
@@ -237,51 +255,116 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildMonthBanner(
       String month, double revenue, double expense, double profit) {
+    final isProfit = profit >= 0;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryDark, AppTheme.primary],
+        gradient: LinearGradient(
+          colors: isProfit
+              ? [const Color(0xFF0D3D28), const Color(0xFF1A7A52), const Color(0xFF28A96E)]
+              : [const Color(0xFF7B1A1A), const Color(0xFFB03030)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primary.withOpacity(0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            color: (isProfit ? AppTheme.primary : AppTheme.error)
+                .withValues(alpha: 0.35),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Text(
-            month,
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.white70,
-              fontWeight: FontWeight.w500,
+          // Decorative circle in corner
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.07),
+              ),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Net Profit: ${AppHelpers.formatCurrency(profit)}',
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          Positioned(
+            right: 10,
+            bottom: -30,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.05),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _bannerStat(
-                  'Revenue', AppHelpers.formatCurrency(revenue), Colors.white),
-              const SizedBox(width: 24),
-              _bannerStat(
-                  'Expense', AppHelpers.formatCurrency(expense), Colors.white70),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_month_outlined,
+                      size: 14, color: Colors.white70),
+                  const SizedBox(width: 6),
+                  Text(
+                    month,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(
+                    isProfit ? Icons.trending_up : Icons.trending_down,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Net ${isProfit ? 'Profit' : 'Loss'}: ${AppHelpers.formatCurrency(profit.abs())}',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _bannerStat('Revenue',
+                        AppHelpers.formatCurrency(revenue), Colors.white),
+                    Container(
+                      width: 1,
+                      height: 36,
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      color: Colors.white30,
+                    ),
+                    _bannerStat('Expense',
+                        AppHelpers.formatCurrency(expense),
+                        Colors.white70),
+                  ],
+                ),
+              ),
             ],
           ),
         ],

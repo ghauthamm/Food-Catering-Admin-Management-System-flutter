@@ -1,35 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// App-wide color palette and theme configuration.
 class AppTheme {
   // ─── Brand Colors ─────────────────────────────────────────────────────────────
-  static const Color primary = Color(0xFF1E6B4A);      // Deep green
-  static const Color primaryLight = Color(0xFF2E9B6E);
-  static const Color primaryDark = Color(0xFF144D35);
+  static const Color primary = Color(0xFF1A7A52);      // Rich forest green
+  static const Color primaryLight = Color(0xFF28A96E);
+  static const Color primaryDark = Color(0xFF0F4F33);
   static const Color accent = Color(0xFFFF6B35);        // Warm orange
-  static const Color accentLight = Color(0xFFFF8C5A);
+  static const Color accentLight = Color(0xFFFF9A6C);
+  static const Color accentDark = Color(0xFFE04D1A);
 
   // ─── Status Colors ────────────────────────────────────────────────────────────
-  static const Color success = Color(0xFF27AE60);
-  static const Color warning = Color(0xFFF39C12);
-  static const Color error = Color(0xFFE74C3C);
-  static const Color info = Color(0xFF2980B9);
+  static const Color success = Color(0xFF22C55E);
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color error = Color(0xFFEF4444);
+  static const Color info = Color(0xFF3B82F6);
 
   // ─── Neutrals ─────────────────────────────────────────────────────────────────
-  static const Color background = Color(0xFFF5F7FA);
+  static const Color background = Color(0xFFF8F3EE);   // Warm cream
   static const Color surface = Colors.white;
-  static const Color textPrimary = Color(0xFF2C3E50);
-  static const Color textSecondary = Color(0xFF7F8C9A);
-  static const Color divider = Color(0xFFECF0F1);
-  static const Color cardShadow = Color(0x1A000000);
+  static const Color textPrimary = Color(0xFF1C2B20);
+  static const Color textSecondary = Color(0xFF6B7B70);
+  static const Color divider = Color(0xFFE8EDE9);
+  static const Color cardShadow = Color(0x14000000);
 
   // ─── Module Colors ────────────────────────────────────────────────────────────
-  static const Color clientColor = Color(0xFF3498DB);
-  static const Color orderColor = Color(0xFF9B59B6);
-  static const Color purchaseColor = Color(0xFFE67E22);
-  static const Color employeeColor = Color(0xFF1ABC9C);
-  static const Color inventoryColor = Color(0xFFE74C3C);
-  static const Color reportColor = Color(0xFF2C3E50);
+  static const Color clientColor   = Color(0xFF3B82F6); // Blue
+  static const Color orderColor    = Color(0xFF8B5CF6); // Purple
+  static const Color purchaseColor = Color(0xFFF97316); // Orange
+  static const Color employeeColor = Color(0xFF14B8A6); // Teal
+  static const Color inventoryColor= Color(0xFFEF4444); // Red
+  static const Color reportColor   = Color(0xFF6366F1); // Indigo
+
+  // ─── Gradient Presets ────────────────────────────────────────────────────────
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [Color(0xFF0F4F33), Color(0xFF1A7A52), Color(0xFF28A96E)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    colors: [Color(0xFFE04D1A), Color(0xFFFF6B35), Color(0xFFFF9A6C)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient dashboardHeaderGradient = LinearGradient(
+    colors: [Color(0xFF0F4F33), Color(0xFF1A7A52)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient warmBgGradient = LinearGradient(
+    colors: [Color(0xFFF8F3EE), Color(0xFFEFF6EF)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static LinearGradient moduleGradient(Color color) => LinearGradient(
+    colors: [color.withValues(alpha: 0.9), color],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  /// Sets the status bar to transparent (call from initState).
+  static void setSystemUiOverlay({bool dark = false}) {
+    SystemChrome.setSystemUIOverlayStyle(
+      dark
+          ? SystemUiOverlayStyle.dark.copyWith(
+              statusBarColor: Colors.transparent)
+          : SystemUiOverlayStyle.light.copyWith(
+              statusBarColor: Colors.transparent),
+    );
+  }
 
   // ─── Light Theme ─────────────────────────────────────────────────────────────
   static ThemeData get lightTheme => ThemeData(
