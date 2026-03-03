@@ -41,6 +41,7 @@ class OrderModel {
   final String id;
   final String clientId;
   final String clientName;
+  final String mealType;
   final List<OrderItem> items;
   final double totalAmount;
   final String date;
@@ -51,6 +52,7 @@ class OrderModel {
     required this.id,
     required this.clientId,
     required this.clientName,
+    this.mealType = 'breakfast',
     required this.items,
     required this.totalAmount,
     required this.date,
@@ -62,6 +64,7 @@ class OrderModel {
         id: json['id'] ?? '',
         clientId: json['clientId'] ?? '',
         clientName: json['clientName'] ?? '',
+        mealType: json['mealType'] ?? 'breakfast',
         items: (json['items'] as List<dynamic>? ?? [])
             .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
             .toList(),
@@ -75,6 +78,7 @@ class OrderModel {
         'id': id,
         'clientId': clientId,
         'clientName': clientName,
+        'mealType': mealType,
         'items': items.map((e) => e.toJson()).toList(),
         'totalAmount': totalAmount,
         'date': date,
@@ -86,6 +90,7 @@ class OrderModel {
     String? id,
     String? clientId,
     String? clientName,
+    String? mealType,
     List<OrderItem>? items,
     double? totalAmount,
     String? date,
@@ -96,6 +101,7 @@ class OrderModel {
         id: id ?? this.id,
         clientId: clientId ?? this.clientId,
         clientName: clientName ?? this.clientName,
+        mealType: mealType ?? this.mealType,
         items: items ?? this.items,
         totalAmount: totalAmount ?? this.totalAmount,
         date: date ?? this.date,
@@ -105,3 +111,4 @@ class OrderModel {
 }
 
 const List<String> orderStatuses = ['pending', 'delivered', 'cancelled'];
+      const List<String> mealTypes = ['breakfast', 'lunch', 'dinner'];

@@ -68,6 +68,7 @@ class OrderProvider extends ChangeNotifier {
   Future<bool> addOrder({
     required String clientId,
     required String clientName,
+    required String mealType,
     required List<OrderItem> items,
     required String date,
     String? notes,
@@ -78,6 +79,7 @@ class OrderProvider extends ChangeNotifier {
         id: 'O${_uuid.v4().substring(0, 8).toUpperCase()}',
         clientId: clientId,
         clientName: clientName,
+        mealType: mealType,
         items: items,
         totalAmount: total,
         date: date,

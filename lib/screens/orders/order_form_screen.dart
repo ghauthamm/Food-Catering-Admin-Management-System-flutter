@@ -25,6 +25,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   ClientModel? _selectedClient;
   String _selectedDate = AppHelpers.today();
+  String _selectedMealType = mealTypes.first;
   List<_ItemRow> _items = [];
   bool _isLoading = false;
 
@@ -46,6 +47,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   void _populateForm() {
     final o = widget.existingOrder!;
     _selectedDate = o.date;
+    _selectedMealType =
+        mealTypes.contains(o.mealType) ? o.mealType : mealTypes.first;
     _notesCtrl.text = o.notes ?? '';
 
     // Find selected client from provider
@@ -120,6 +123,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       final updated = widget.existingOrder!.copyWith(
         clientId: _selectedClient!.id,
         clientName: _selectedClient!.name,
+        mealType: _selectedMealType,
         items: items,
         totalAmount: total,
         date: _selectedDate,
@@ -130,6 +134,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       success = await provider.addOrder(
         clientId: _selectedClient!.id,
         clientName: _selectedClient!.name,
+        mealType: _selectedMealType,
         items: items,
         date: _selectedDate,
         notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
@@ -193,6 +198,27 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         selectedDate: _selectedDate,
                         onDateSelected: (d) =>
                             setState(() => _selectedDate = d),
+                      ),
+                      const SizedBox(height: 16),
+
+                      CustomDropdownField<String>(
+                        label: 'Meal Type *',
+                        value: _selectedMealType,
+                        prefixIcon: const Icon(Icons.restaurant_menu_outlined),
+                        items: mealTypes
+                            .map((type) => DropdownMenuItem(
+                                  value: type,
+                                  child: Text(
+                                    '${type[0].toUpperCase()}${type.substring(1)}',
+                                  ),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value == null) return;
+                          setState(() => _selectedMealType = value);
+                        },
+                        validator: (value) =>
+                            value == null || value.isEmpty ? 'Please select meal type' : null,
                       ),
                       const SizedBox(height: 24),
 
