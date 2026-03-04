@@ -135,6 +135,12 @@ class AppDrawer extends StatelessWidget {
                   onTap: () => _navigate(context, AppConstants.routeEmployees),
                 ),
                 _DrawerItem(
+                  icon: Icons.restaurant_menu_outlined,
+                  label: 'Day Menu',
+                  color: AppTheme.accent,
+                  onTap: () => _navigate(context, AppConstants.routeMenu),
+                ),
+                _DrawerItem(
                   icon: Icons.inventory_2_outlined,
                   label: 'Inventory',
                   color: AppTheme.inventoryColor,

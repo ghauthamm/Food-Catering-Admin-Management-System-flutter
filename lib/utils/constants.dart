@@ -18,6 +18,8 @@ class AppConstants {
   static const String routeEmployeeForm = '/employees/form';
   static const String routeAttendance = '/employees/attendance';
   static const String routeInventoryForm = '/inventory/form';
+  static const String routeMenu = '/menu';
+  static const String routeMenuForm = '/menu/form';
 
   // ─── Shared Prefs Keys ────────────────────────────────────────────────────────
   static const String prefThemeMode = 'theme_mode';

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../models/client_model.dart';
+import '../../models/menu_model.dart';
 import '../../models/order_model.dart';
 import '../../providers/client_provider.dart';
+import '../../providers/menu_provider.dart';
 import '../../providers/order_provider.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/helpers.dart';
@@ -36,6 +38,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ClientProvider>().loadClients();
+      context.read<MenuProvider>().loadMenus();
       if (_isEditing) {
         _populateForm();
       } else {
@@ -221,6 +224,25 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                             value == null || value.isEmpty ? 'Please select meal type' : null,
                       ),
                       const SizedBox(height: 24),
+
+                      // ─── Pick from Menu ─────────────────────────────────
+                      _MenuPickerSection(
+                        selectedDate: _selectedDate,
+                        selectedMealType: _selectedMealType,
+                        onItemsSelected: (menuItems) {
+                          setState(() {
+                            for (final mi in menuItems) {
+                              _items.add(_ItemRow(
+                                nameCtrl: TextEditingController(text: mi.name),
+                                qtyCtrl: TextEditingController(text: '1'),
+                                priceCtrl: TextEditingController(
+                                    text: mi.price.toString()),
+                              ));
+                            }
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
 
                       // ─── Order Items ──────────────────────────────────────
                       Row(
@@ -475,6 +497,193 @@ class _ItemRowWidget extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Menu Picker Section ──────────────────────────────────────────────────────
+/// Shows today's menu items based on selected date & meal type.
+/// Allows user to pick items from the menu to auto-fill order items.
+class _MenuPickerSection extends StatelessWidget {
+  final String selectedDate;
+  final String selectedMealType;
+  final void Function(List<MenuItem> items) onItemsSelected;
+
+  const _MenuPickerSection({
+    required this.selectedDate,
+    required this.selectedMealType,
+    required this.onItemsSelected,
+  });
+
+  String _getDayName(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      const days = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday'
+      ];
+      return days[date.weekday - 1];
+    } catch (_) {
+      return 'Monday';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final menuProvider = context.watch<MenuProvider>();
+    final dayName = _getDayName(selectedDate);
+    final menuItems =
+        menuProvider.getMenuItemsForDayAndMeal(dayName, selectedMealType);
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.info.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.info.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.restaurant_menu, size: 18, color: AppTheme.info),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "$dayName's ${selectedMealType[0].toUpperCase()}${selectedMealType.substring(1)} Menu",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.info,
+                  ),
+                ),
+              ),
+              if (menuItems.isNotEmpty)
+                TextButton.icon(
+                  onPressed: () => _showMenuPickerDialog(context, menuItems),
+                  icon: const Icon(Icons.playlist_add, size: 18),
+                  label: const Text('Pick Items'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.info,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    textStyle: const TextStyle(fontSize: 13),
+                  ),
+                ),
+            ],
+          ),
+          if (menuItems.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'No menu set for $dayName ${selectedMealType}. '
+                'You can add items manually below.',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: menuItems
+                    .map((item) => Chip(
+                          label: Text(
+                            '${item.name} (₹${item.price.toStringAsFixed(0)})',
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          backgroundColor: AppTheme.info.withOpacity(0.08),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                        ))
+                    .toList(),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showMenuPickerDialog(
+      BuildContext context, List<MenuItem> menuItems) {
+    final selected = List<bool>.filled(menuItems.length, false);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return AlertDialog(
+            title: const Text('Pick Menu Items'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: menuItems.length,
+                itemBuilder: (_, i) {
+                  final item = menuItems[i];
+                  return CheckboxListTile(
+                    value: selected[i],
+                    activeColor: AppTheme.primary,
+                    title: Text(item.name,
+                        style: const TextStyle(fontSize: 14)),
+                    subtitle: Text(
+                      '₹${item.price.toStringAsFixed(2)}'
+                      '${item.category != null ? ' • ${item.category}' : ''}',
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    onChanged: (v) =>
+                        setDialogState(() => selected[i] = v ?? false),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    dense: true,
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Select all
+                  setDialogState(() {
+                    for (int i = 0; i < selected.length; i++) {
+                      selected[i] = true;
+                    }
+                  });
+                },
+                child: const Text('Select All'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  final picked = <MenuItem>[];
+                  for (int i = 0; i < menuItems.length; i++) {
+                    if (selected[i]) picked.add(menuItems[i]);
+                  }
+                  Navigator.pop(ctx);
+                  if (picked.isNotEmpty) {
+                    onItemsSelected(picked);
+                  }
+                },
+                child: const Text('Add Selected'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

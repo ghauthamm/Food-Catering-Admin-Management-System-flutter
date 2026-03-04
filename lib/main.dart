@@ -5,6 +5,7 @@ import 'providers/auth_provider.dart';
 import 'providers/client_provider.dart';
 import 'providers/employee_provider.dart';
 import 'providers/inventory_provider.dart';
+import 'providers/menu_provider.dart';
 import 'providers/order_provider.dart';
 import 'providers/purchase_provider.dart';
 import 'screens/auth/login_screen.dart';
@@ -16,6 +17,7 @@ import 'screens/employees/employee_form_screen.dart';
 import 'screens/employees/employees_screen.dart';
 import 'screens/inventory/inventory_form_screen.dart';
 import 'screens/inventory/inventory_screen.dart';
+import 'screens/menu/menu_screen.dart';
 import 'screens/orders/order_form_screen.dart';
 import 'screens/orders/orders_screen.dart';
 import 'screens/purchases/purchase_form_screen.dart';
@@ -42,6 +44,7 @@ class CateringAdminApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PurchaseProvider()),
         ChangeNotifierProvider(create: (_) => EmployeeProvider()),
         ChangeNotifierProvider(create: (_) => InventoryProvider()),
+        ChangeNotifierProvider(create: (_) => MenuProvider()),
       ],
       child: MaterialApp(
         title: AppConstants.appName,
@@ -63,6 +66,7 @@ class CateringAdminApp extends StatelessWidget {
           AppConstants.routeEmployeeForm: (_) => const EmployeeFormScreen(),
           AppConstants.routeInventory: (_) => const InventoryScreen(),
           AppConstants.routeInventoryForm: (_) => const InventoryFormScreen(),
+          AppConstants.routeMenu: (_) => const MenuScreen(),
           AppConstants.routeReports: (_) => const ReportsScreen(),
         },
       ),
